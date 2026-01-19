@@ -1,0 +1,93 @@
+Document Title: Northwind Health — Customer Ops Knowledge Base (v1.7)
+Last updated: 2026-01-05
+Audience: Support agents, customer success, and operations
+1) Company & Products
+Northwind Health provides a care coordination platform used by outpatient clinics. The platform has three modules:
+
+Intake: online forms, eligibility checks, insurance capture, and appointment requests.
+CareHub: tasks, care plans, referrals, and secure messaging.
+Insights: dashboards for no-show rates, referral leakage, and care gap tracking.
+
+Clinics typically use Intake and CareHub daily. Insights is used weekly by managers.
+2) Common Customer Questions (FAQ)
+Q: How long does it take to onboard a new clinic?
+A: Typical onboarding is 2–4 weeks depending on EHR integration, SSO (single sign-on) setup, and data migration.
+Q: What is the fastest onboarding path?
+A: Use CSV patient import and password-based login first, then add SSO and EHR integration later.
+Q: Does the system support multiple locations?
+A: Yes. A single tenant can support multiple locations with location-based roles and reporting filters.
+Q: Can patients message providers?
+A: Yes in CareHub secure messaging. Patients can message a care team inbox; clinics can configure auto-responses outside business hours.
+3) Pricing & Packaging (Customer-safe summary)
+Northwind Health pricing has two dimensions:
+
+Base subscription by clinic size (small, mid, enterprise)
+Module add-ons (CareHub, Insights, premium integrations)
+
+Discounts:
+
+Annual prepay may qualify for a discount.
+Multi-clinic contracts may qualify for tiered pricing.
+Important: Sales owns final pricing approval. Support should not quote numbers; refer to the account owner.
+
+4) Support & Escalation
+Support hours are 8am–8pm ET, Monday–Friday (excluding US holidays).
+Severity levels:
+
+SEV-1 (Critical): System outage or widespread inability to access core workflows (login failures affecting many users, major API outage). Response target: 15 minutes.
+SEV-2 (High): Major feature impairment with workaround (appointments not syncing for one clinic). Response target: 1 hour.
+SEV-3 (Normal): Standard issues and “how-to” questions. Response target: 4 business hours.
+
+Escalation rules:
+
+Escalate to Engineering if reproducible and affects production workflows.
+Escalate to Security if suspected PHI exposure, suspicious login patterns, or unusual data exports.
+
+5) Security & Compliance Overview
+Northwind Health is designed for healthcare environments:
+
+Data is encrypted in transit (TLS) and at rest.
+Role-based access control is enforced at the tenant and location level.
+Audit logs track logins, exports, and record access.
+
+PHI handling:
+If a customer reports potential PHI exposure, do not request screenshots containing PHI. Ask for:
+
+affected clinic name and tenant ID
+approximate time window
+user emails involved (if known)
+what they believe was exposed (messages, patient profile, exports)
+
+Then escalate to Security immediately.
+6) Integration Notes (EHR + SSO)
+EHR integrations: The platform supports HL7 interfaces for ADT and scheduling updates, and an API-based integration for select EHR vendors. Common delays are caused by:
+
+clinic IT firewall rules blocking outbound webhooks
+mismatched patient identifiers between systems
+incomplete mapping for appointment statuses (e.g., “Arrived”, “Checked-In”, “In Room”)
+
+SSO setup: SAML 2.0 is supported. Most SSO issues come from:
+
+incorrect ACS URL configured in the IdP
+missing email attribute mapping
+clock drift causing assertion expiry
+
+7) Recent Incident Summary (for retrieval testing)
+Incident INC-20491 (Resolved):
+On 2025-12-11, some clinics experienced delayed task notifications in CareHub. Root cause was a queue backlog after a deployment. Mitigation was to scale workers and replay events. No data loss occurred; notifications were delivered late.
+Incident INC-20503 (Resolved):
+On 2025-12-19, a subset of users could not export reports from Insights. The export service returned intermittent 503 errors. A hotfix updated retry logic and improved service health checks.
+8) Internal How-To: Troubleshooting Login Failures
+When a user reports they “can’t log in,” identify which case applies:
+
+Password login: verify email, check lockout status, confirm password reset email delivery.
+SSO login: confirm they used the correct SSO URL, verify IdP status, validate SAML attributes.
+Multi-location user: ensure they have at least one active role assignment.
+
+If multiple users at the same clinic are impacted, treat as SEV-2 or SEV-1 depending on scope.
+9) Glossary
+
+Tenant: One customer environment (may include multiple clinic locations)
+PHI: Protected Health Information
+HL7 ADT: Healthcare messaging feed for admissions/discharges/transfers
+IdP: Identity Provider used for SSO
